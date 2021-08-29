@@ -1,5 +1,6 @@
 yfinance
 beautifulsoup4
 requests
-pypdf2
 spacy
+PyMuPDF
+Pillow

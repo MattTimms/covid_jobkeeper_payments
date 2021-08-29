@@ -1,5 +1,5 @@
 import os
-from typing import Dict
+from typing import Dict, List
 from urllib.parse import urljoin
 
 import requests
@@ -46,7 +46,7 @@ def download_announcement(output_path: str, url_path: str):
         f.write(response.content)
 
 
-def download_annual_reports(code: str, name: str):
+def download_annual_reports(code: str, name: str) -> List[str]:
     company_code = code.upper()
 
     announcements = get_announcements(company_code)
@@ -55,8 +55,11 @@ def download_annual_reports(code: str, name: str):
     output_dir = os.path.join(DATA_DST, f'{company_code} - {name}')
     os.makedirs(output_dir, exist_ok=True)
 
+    file_paths = []
     for title in annual_report_ann:
         output_file_path = os.path.join(output_dir, f'{title}.pdf')
         if not os.path.exists(output_file_path):
             download_announcement(output_file_path, announcements[title])
         print(output_file_path)
+        file_paths.append(output_file_path)
+    return file_paths
