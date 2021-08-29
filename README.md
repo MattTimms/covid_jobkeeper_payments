@@ -12,6 +12,9 @@
 3) get profits & dividends per company
 
 4) do it to companies that matter by share price, etc.
+   1) asx100
+   2) asx200
+   3) https://www.asx20list.com/
 
 
 reference

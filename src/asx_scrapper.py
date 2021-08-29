@@ -2,12 +2,10 @@ import os
 from typing import Dict
 from urllib.parse import urljoin
 
-import yfinance as yf
 import requests
 from bs4 import BeautifulSoup
 
 DATA_DST = os.getenv('DATA_DST', default='./tmp/')
-
 
 # Define endpoint & headers
 endpoint = "https://www.asx.com.au/"
@@ -15,7 +13,6 @@ session = requests.session()
 session.hooks = {
     'response': lambda r, *args, **kwargs: r.raise_for_status()
 }
-
 
 
 def get_announcements(company_code: str) -> Dict[str, str]:
@@ -49,22 +46,17 @@ def download_announcement(output_path: str, url_path: str):
         f.write(response.content)
 
 
-company_code = 'hvn'.upper()
+def download_annual_reports(code: str, name: str):
+    company_code = code.upper()
 
-yf_ticker = yf.Ticker(f'{company_code}.AX')
-company_name = yf_ticker.info['longName']
+    announcements = get_announcements(company_code)
+    annual_report_ann = list(filter(lambda title: "Annual Report" in title, announcements.keys()))
 
-announcements = get_announcements(company_code)
-annual_report_ann = list(filter(lambda title: "Annual Report" in title, announcements.keys()))
+    output_dir = os.path.join(DATA_DST, f'{company_code} - {name}')
+    os.makedirs(output_dir, exist_ok=True)
 
-output_dir = os.path.join(DATA_DST, f'{company_code} - {company_name}')
-os.makedirs(output_dir, exist_ok=True)
-
-for title in annual_report_ann:
-    output_file_path = os.path.join(output_dir,  f'{title}.pdf')
-    if not os.path.exists(output_file_path):
-        download_announcement(output_file_path, announcements[title])
-    print(output_file_path)
-
-print(yf_ticker.dividends)
-print(yf_ticker.financials.loc['Gross Profit', :])
+    for title in annual_report_ann:
+        output_file_path = os.path.join(output_dir, f'{title}.pdf')
+        if not os.path.exists(output_file_path):
+            download_announcement(output_file_path, announcements[title])
+        print(output_file_path)
