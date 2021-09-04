@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from collections import namedtuple
+from dataclasses import dataclass
+from typing import List
 
 session = requests.session()
 session.hooks = {
@@ -12,10 +13,14 @@ allowed_indexes = [
     20, 50, 100, 200, 300
 ]
 
-company = namedtuple('company', ["code", "name"])
+
+@dataclass
+class Company:
+    code: str
+    name: str
 
 
-def get_index_companies(index: int = 20):
+def get_index_companies(index: int = 20) -> List[Company]:
     if index not in allowed_indexes:
         raise ValueError(f'index must be in {allowed_indexes}')
 
@@ -29,5 +34,5 @@ def get_index_companies(index: int = 20):
             continue
 
         code, name = row.text[:3], row.text[3:]
-        companies.append(company(code, name))
+        companies.append(Company(code, name))
     return companies
